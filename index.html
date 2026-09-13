@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Interruptor Neurobiológico | Dinero Mental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --cyan: #00d9ff;
+            --cyan-dark: #0099cc;
+            --red: #ff3366;
+            --orange: #ffaa00;
+            --green: #00ff88;
+            --green-dark: #00cc6a;
+            --text-light: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --yt-red: #ff0000;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-secondary) 50%, #16213e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding-bottom: 60px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: var(--cyan);
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+
+        .neuro-panel {
+            background: rgba(20, 20, 35, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 51, 102, 0.4); /* Starts Red */
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.15);
+            transition: all 1s ease;
+        }
+
+        .neuro-panel.safe {
+            border-color: rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+        }
+
+        .neuro-panel h2 {
+            color: var(--red);
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 1s ease;
+        }
+        
+        .neuro-panel.safe h2 { color: var(--green); }
+
+        .metric { margin-bottom: 15px; }
+
+        .metric-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #b0b0b0;
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            height: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1s ease-in-out, background 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-weight: bold;
+            font-size: 0.75em;
+            color: white;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .bg-danger { background: linear-gradient(90deg, #cc0033, var(--red)); box-shadow: 0 0 10px var(--red); }
+        .bg-warning { background: linear-gradient(90deg, #cc8800, var(--orange)); box-shadow: 0 0 10px var(--orange); }
+        .bg-safe { background: linear-gradient(90deg, var(--green-dark), var(--green)); box-shadow: 0 0 10px var(--green); }
+        .bg-optimal { background: linear-gradient(90deg, var(--cyan-dark), var(--cyan)); box-shadow: 0 0 10px var(--cyan); }
+        .bg-idle { background: #303040; }
+
+        .brain-state {
+            background: rgba(255, 51, 102, 0.1);
+            border-left: 4px solid var(--red);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+            transition: all 1s ease;
+        }
+
+        .brain-state-text {
+            color: var(--red);
+            font-weight: 600;
+            font-size: 0.95em;
+            line-height: 1.4;
+            transition: color 1s ease;
+        }
+
+        .brain-state.safe {
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--green);
+        }
+        .brain-state.safe .brain-state-text { color: var(--green); }
+
+        .step {
+            background: rgba(30, 30, 45, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0.4;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .step.active {
+            opacity: 1;
+            pointer-events: all;
+            border-color: rgba(0, 217, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.05);
+        }
+
+        .step.completed {
+            opacity: 0.7;
+            pointer-events: none;
+            border-color: rgba(0, 255, 136, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background: rgba(255, 255, 255, 0.1);
+            color: #808080;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
+            color: var(--bg-main);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+        }
+        
+        .step.completed .step-number {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: var(--bg-main);
+        }
+
+        .step-title {
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-description {
+            color: #a0a0b0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
+            color: var(--bg-main);
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: #606060;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .breathing-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            display: none;
+        }
+
+        .breathing-text {
+            font-size: 1.8em;
+            color: var(--cyan);
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+            text-transform: uppercase;
+            height: 35px; 
+            transition: color 0.5s ease;
+        }
+
+        .breathing-box {
+            width: 120px;
+            height: 120px;
+            border: 4px solid var(--cyan);
+            border-radius: 20px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 4s linear;
+            box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.2), 0 0 20px rgba(0, 217, 255, 0.2);
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Breathing states */
+        .box-inhale { transform: scale(1.5); border-radius: 50%; border-color: var(--cyan); box-shadow: inset 0 0 40px rgba(0, 217, 255, 0.4), 0 0 40px rgba(0, 217, 255, 0.4); }
+        .box-hold-1 { transform: scale(1.5); border-radius: 50%; border-color: var(--green); box-shadow: inset 0 0 40px rgba(0, 255, 136, 0.4), 0 0 40px rgba(0, 255, 136, 0.4); }
+        .box-exhale { transform: scale(1); border-radius: 20px; border-color: var(--green); box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.2), 0 0 20px rgba(0, 255, 136, 0.2); }
+        .box-hold-2 { transform: scale(1); border-radius: 20px; border-color: var(--cyan); box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.2), 0 0 20px rgba(0, 217, 255, 0.2); }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            color: #ffffff;
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
+        }
+        textarea::placeholder { color: #505060; }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.85em;
+            color: #606060;
+            margin-bottom: 15px;
+            font-family: monospace;
+            transition: color 0.3s;
+        }
+        .char-counter.valid { color: var(--cyan); }
+
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 64px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .slider-bg-fill {
+            position: absolute;
+            top: 0; left: 0; height: 100%; width: 0%;
+            background: linear-gradient(90deg, rgba(0,217,255,0.2), rgba(0,255,136,0.4));
+            pointer-events: none;
+            transition: width 0.1s;
+        }
+
+        .slider-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #808090;
+            font-size: 0.95em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.2s;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        input[type=range]:focus { outline: none; }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 56px;
+            width: 56px;
+            border-radius: 50%;
+            background: var(--cyan);
+            cursor: grab;
+            margin-top: 0px;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%230f0f1a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.1s;
+        }
+        
+        input[type=range]::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(0.95); }
+
+        .victory-banner {
+            display: none;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 217, 255, 0.05));
+            border: 1px solid var(--green);
+            border-radius: 15px;
+            padding: 35px 25px;
+            text-align: center;
+            margin-top: 20px;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .victory-banner.show { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .victory-title {
+            font-size: 1.8em;
+            color: var(--green);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        
+        .victory-text {
+            color: #e0e0e0;
+            line-height: 1.6;
+            font-size: 1.05em;
+            margin-bottom: 25px;
+        }
+
+        .victory-text span {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        /* YouTube Subscription Button */
+        .yt-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: var(--yt-red);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.05em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+            width: 100%;
+        }
+
+        .yt-btn:hover {
+            background: #e60000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .yt-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+        
+        .header-yt-link {
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            color: var(--yt-red);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .header-yt-link:hover { opacity: 1; }
+
+        @media (max-width: 600px) {
+            .header-yt-link { position: static; display: inline-block; margin-top: 15px; }
+            h1 { font-size: 1.8em; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>El Interruptor</h1>
+            <p class="subtitle">Hackea tu biología para frenar compras compulsivas nocturnas.</p>
+            <a href="https://www.youtube.com/channel/UCDoMZYf0Yi2cjOVjdfO94tw?sub_confirmation=1" target="_blank" class="header-yt-link" title="Suscríbete a Dinero Mental">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+            </a>
+        </header>
+
+        <!-- PANEL NEUROQUÍMICO -->
+        <div class="neuro-panel" id="neuro-panel">
+            <h2 id="panel-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 5 18 3-9h5"/></svg>
+                Monitor Neuroquímico
+            </h2>
+            
+            <div class="metric">
+                <div class="metric-label">
+                    <span>🔴 Alarma de la Amígdala</span>
+                    <span id="val-amygdala" style="color: var(--red);">95%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar bg-danger" id="bar-amygdala" style="width: 95%;"></div>
+                </div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">
+                    <span>🔵 Nivel de Cortisol (Estrés)</span>
+                    <span id="val-cortisol" style="color: var(--red);">85%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar bg-danger" id="bar-cortisol" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="metric" style="margin-bottom: 0;">
+                <div class="metric-label">
+                    <span>🧠 Actividad Lóbulo Frontal (Lógica)</span>
+                    <span id="val-frontal" style="color: #606060;">10%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar bg-idle" id="bar-frontal" style="width: 10%;"></div>
+                </div>
+            </div>
+
+            <div class="brain-state" id="brain-state-box">
+                <div class="brain-state-text" id="brain-state-text">⚠️ MODO SUPERVIVENCIA ACTIVO: Búsqueda desesperada de dopamina inmediata.</div>
+            </div>
+        </div>
+
+        <div class="step active" id="step-1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Reinicio Vagal</div>
+            </div>
+            <p class="step-description">Tu cerebro está en números rojos. Para apagar la alarma, la herramienta te guiará en una respiración en caja de 16 segundos para estimular el nervio vago y frenar la respuesta de lucha/huida.</p>
+            
+            <button class="btn" id="btn-start-breath" onclick="startBreathing()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Iniciar Ciclo (16s)
+            </button>
+
+            <div class="breathing-display" id="breath-display">
+                <div class="breathing-text" id="breath-text">PREPÁRATE</div>
+                <div class="breathing-box" id="breath-box">4</div>
+            </div>
+        </div>
+
+        <div class="step" id="step-2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Etiquetado Afectivo</div>
+            </div>
+            <p class="step-description">El truco de magia científica. No hables de lo que quieres comprar. Escribe en un párrafo <strong>qué te duele o frustra realmente hoy</strong>. Verbalizarlo reconecta el puente de la lógica.</p>
+            
+            <textarea id="affective-input" placeholder="Hoy me siento agotado/a o frustrado/a porque..." oninput="checkText()"></textarea>
+            <div class="char-counter" id="char-counter">0 / 40 caracteres (Mínimo para procesar)</div>
+            
+            <button class="btn" id="btn-frontal" disabled onclick="activateFrontal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Reconectar Lógica
+            </button>
+        </div>
+
+        <div class="step" id="step-3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Fricción Motora</div>
+            </div>
+            <p class="step-description">Tu mano sigue en piloto automático. Desliza el interruptor hasta el final para crear fricción motora real y romper físicamente el hechizo de compra.</p>
+            
+            <div class="slider-wrapper">
+                <div class="slider-bg-fill" id="slider-fill"></div>
+                <div class="slider-text" id="slider-text">Desliza para abortar compra</div>
+                <input type="range" id="motor-slider" min="0" max="100" value="0" oninput="updateSlider()">
+            </div>
+        </div>
+
+        <div class="victory-banner" id="victory-banner">
+            <div class="victory-title">Hechizo Roto 🛡️</div>
+            <p class="victory-text">
+                El puente hacia tu lógica se ha reconstruido por completo. Ya no necesitas comprar ese objeto inútil para calmarte, porque acabas de regular tu sistema nervioso <span>gratis</span>, usando tu propia biología, y no tu cuenta corriente.
+            </p>
+            <p class="victory-text" style="font-size: 0.95em; color: #a0a0b0; margin-bottom: 25px;">
+                Cierra la tienda y ve a descansar. Has ganado.
+            </p>
+            
+            <!-- CTA Suscripción YouTube -->
+            <a href="https://www.youtube.com/channel/UCDoMZYf0Yi2cjOVjdfO94tw?sub_confirmation=1" target="_blank" class="yt-btn">
+                <svg viewBox="0 0 24 24"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+                Suscríbete a Dinero Mental
+            </a>
+            <p style="margin-top: 15px; font-size: 0.85em; color: #808080;">Únete para más herramientas de neurociencia financiera.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Utilidades de actualización visual
+        function updateBar(id, val, textId, colorClass, removeClass = '') {
+            const bar = document.getElementById(id);
+            const text = document.getElementById(textId);
+            bar.style.width = val + '%';
+            text.innerText = val + '%';
+            if (removeClass) bar.classList.remove(removeClass);
+            bar.classList.add(colorClass);
+            
+            // Colorear texto
+            if(colorClass === 'bg-safe') text.style.color = 'var(--green)';
+            if(colorClass === 'bg-optimal') text.style.color = 'var(--cyan)';
+            if(colorClass === 'bg-warning') text.style.color = 'var(--orange)';
+        }
+
+        // --- PASO 1 LÓGICA (Respiración en Caja 16s) ---
+        function startBreathing() {
+            const btn = document.getElementById('btn-start-breath');
+            const display = document.getElementById('breath-display');
+            const text = document.getElementById('breath-text');
+            const box = document.getElementById('breath-box');
+            
+            btn.style.display = 'none';
+            display.style.display = 'block';
+
+            // Cambiar estado panel a "Regulando"
+            const panelText = document.getElementById('brain-state-text');
+            panelText.innerText = '⚡ REGULANDO: Nervio vago activado. El cortisol empieza a caer.';
+            panelText.style.color = 'var(--orange)';
+            document.getElementById('brain-state-box').style.borderLeftColor = 'var(--orange)';
+            
+            // Simular caída progresiva
+            updateBar('bar-amygdala', 70, 'val-amygdala', 'bg-warning', 'bg-danger');
+            
+            let phase = 0;
+            let timer = 4;
+            
+            const phases = [
+                { txt: "INHALA", class: "box-inhale", color: "var(--cyan)" },
+                { txt: "RETÉN", class: "box-hold-1", color: "var(--green)" },
+                { txt: "EXHALA", class: "box-exhale", color: "var(--green)" },
+                { txt: "RETÉN", class: "box-hold-2", color: "var(--cyan)" }
+            ];
+
+            box.innerText = timer;
+            text.innerText = phases[phase].txt;
+            text.style.color = phases[phase].color;
+            box.classList.add(phases[phase].class);
+
+            const interval = setInterval(() => {
+                timer--;
+                
+                if (timer <= 0) {
+                    box.classList.remove(phases[phase].class);
+                    phase++;
+                    
+                    if (phase >= 4) {
+                        clearInterval(interval);
+                        finishBreathing();
+                        return;
+                    }
+                    
+                    timer = 4;
+                    text.innerText = phases[phase].txt;
+                    text.style.color = phases[phase].color;
+                    box.classList.add(phases[phase].class);
+
+                    // Bajar barras a medida que avanza
+                    if(phase === 1) updateBar('bar-cortisol', 60, 'val-cortisol', 'bg-warning', 'bg-danger');
+                    if(phase === 2) updateBar('bar-amygdala', 40, 'val-amygdala', 'bg-warning');
+                    if(phase === 3) updateBar('bar-cortisol', 35, 'val-cortisol', 'bg-warning');
+                }
+                box.innerText = timer;
+            }, 1000);
+        }
+
+        function finishBreathing() {
+            const text = document.getElementById('breath-text');
+            const box = document.getElementById('breath-box');
+            
+            text.innerText = "COMPLETADO";
+            text.style.color = 'var(--green)';
+            box.style.borderColor = 'var(--green)';
+            box.style.transform = 'scale(1)';
+            box.innerText = "✓";
+            
+            // Finalizar Paso 1, Activar Paso 2
+            document.getElementById('step-1').classList.replace('active', 'completed');
+            document.getElementById('step-2').classList.add('active');
+            
+            // Actualizar Barras a un estado más seguro
+            updateBar('bar-amygdala', 25, 'val-amygdala', 'bg-safe', 'bg-warning');
+            updateBar('bar-cortisol', 28, 'val-cortisol', 'bg-safe', 'bg-warning');
+            
+            // Scroll a paso 2
+            document.getElementById('step-2').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // --- PASO 2 LÓGICA (Etiquetado) ---
+        function checkText() {
+            const input = document.getElementById('affective-input').value;
+            const counter = document.getElementById('char-counter');
+            const btn = document.getElementById('btn-frontal');
+            const min = 40;
+
+            counter.innerText = `${input.length} / ${min} caracteres mínimos`;
+
+            if (input.length >= min) {
+                counter.classList.add('valid');
+                btn.disabled = false;
+                // Feedback visual de que el frontal está despertando
+                document.getElementById('bar-frontal').style.width = '45%';
+                document.getElementById('val-frontal').innerText = '45%';
+                document.getElementById('bar-frontal').classList.remove('bg-idle');
+                document.getElementById('bar-frontal').classList.add('bg-optimal');
+                document.getElementById('val-frontal').style.color = 'var(--cyan)';
+            } else {
+                counter.classList.remove('valid');
+                btn.disabled = true;
+            }
+        }
+
+        function activateFrontal() {
+            // Finalizar Paso 2, Activar Paso 3
+            document.getElementById('step-2').classList.replace('active', 'completed');
+            document.getElementById('step-3').classList.add('active');
+
+            // Subir Frontal
+            document.getElementById('bar-frontal').style.width = '85%';
+            document.getElementById('val-frontal').innerText = '85%';
+
+            // Scroll a paso 3
+            document.getElementById('step-3').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // --- PASO 3 LÓGICA (Fricción) ---
+        const slider = document.getElementById('motor-slider');
+        const sliderFill = document.getElementById('slider-fill');
+        const sliderText = document.getElementById('slider-text');
+        let isDragging = false;
+
+        function updateSlider() {
+            const val = slider.value;
+            sliderFill.style.width = val + '%';
+            sliderText.style.opacity = 1 - (val / 100);
+
+            if (val == 100) {
+                slider.disabled = true;
+                triggerVictory();
+            }
+        }
+
+        // Forzar "Snap back" para simular fricción real (si suelta antes del 100%)
+        slider.addEventListener('mousedown', () => isDragging = true);
+        slider.addEventListener('touchstart', () => isDragging = true, {passive: true});
+        
+        const snapBack = () => {
+            if(slider.value < 100 && !slider.disabled) {
+                slider.value = 0;
+                updateSlider();
+            }
+            isDragging = false;
+        };
+
+        window.addEventListener('mouseup', snapBack);
+        window.addEventListener('touchend', snapBack);
+
+        function triggerVictory() {
+            document.getElementById('step-3').classList.replace('active', 'completed');
+            document.getElementById('victory-banner').classList.add('show');
+            
+            // Estado final neuroquímico
+            const panel = document.getElementById('neuro-panel');
+            const stateBox = document.getElementById('brain-state-box');
+            
+            panel.classList.add('safe');
+            stateBox.classList.add('safe');
+            document.getElementById('brain-state-text').innerText = '✅ SISTEMA ESTABLE: Puente lógico restaurado. Impulso neutralizado.';
+            
+            updateBar('bar-amygdala', 5, 'val-amygdala', 'bg-safe');
+            updateBar('bar-cortisol', 10, 'val-cortisol', 'bg-safe');
+            
+            document.getElementById('bar-frontal').style.width = '100%';
+            document.getElementById('val-frontal').innerText = '100%';
+            
+            // Scroll suave hacia la victoria (donde está el botón de youtube)
+            setTimeout(() => {
+                document.getElementById('victory-banner').scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 300);
+        }
+
+    </script>
+</body>
+</html>
