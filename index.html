@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Interruptor Neurobiológico | Dinero Mental</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#050B14',
+                            card: '#0F172A',
+                            accent: '#F5A623', // Warm amber for focus
+                            accentGlow: 'rgba(245, 166, 35, 0.4)',
+                            danger: '#EF4444', // Red for high stress
+                            success: '#10B981', // Green for calm
+                            text: '#F8FAFC',
+                            muted: '#94A3B8',
+                            border: '#1E293B'
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'pulse-slow': 'pulseOpacity 3s infinite ease-in-out',
+                        'float': 'floating 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseOpacity: {
+                            '0%, 100%': { opacity: '0.6' },
+                            '50%': { opacity: '1' },
+                        },
+                        floating: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: theme('colors.brand.dark');
+            color: theme('colors.brand.text');
+            -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%);
+        }
+
+        /* View Management */
+        .view-step {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .view-step.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Breathing Animation Sequence (16 seconds total: 4 in, 4 hold, 4 out, 4 hold) */
+        .breath-animating {
+            animation: breatheCycle 16s linear forwards;
+        }
+
+        @keyframes breatheCycle {
+            /* 0-4s: Inhale (Scale Up, Warm Glow) */
+            0% { transform: scale(1); box-shadow: 0 0 0px theme('colors.brand.accentGlow'); border-color: theme('colors.brand.accent'); background-color: transparent; }
+            25% { transform: scale(1.4); box-shadow: 0 0 40px theme('colors.brand.accentGlow'); border-color: theme('colors.brand.accent'); background-color: rgba(245, 166, 35, 0.1); }
+            /* 4-8s: Hold (Maintain) */
+            25.1% { transform: scale(1.4); }
+            50% { transform: scale(1.4); box-shadow: 0 0 20px theme('colors.brand.accentGlow'); background-color: transparent; }
+            /* 8-12s: Exhale (Scale Down, Turn Calm Green) */
+            50.1% { transform: scale(1.4); }
+            75% { transform: scale(1); box-shadow: 0 0 40px rgba(16, 185, 129, 0.4); border-color: theme('colors.brand.success'); background-color: rgba(16, 185, 129, 0.1); }
+            /* 12-16s: Hold (Maintain Calm) */
+            75.1% { transform: scale(1); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); border-color: theme('colors.brand.success'); background-color: transparent; }
+        }
+
+        /* Smooth Progress Bars */
+        .progress-fill {
+            transition: width 0.1s linear, background-color 2s ease;
+        }
+
+        /* Enhanced Friction Slider */
+        .friction-slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            background: #0F172A;
+            border-radius: 999px;
+            border: 2px solid theme('colors.brand.border');
+            overflow: hidden;
+            box-shadow: inset 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        #friction-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Custom Track styling via background in JS */
+        .slider-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #9333ea, #3b82f6, #10b981); /* Purple to Blue to Green logic path */
+            width: 0%;
+            pointer-events: none;
+            z-index: 1;
+            transition: width 0.05s linear;
+        }
+
+        #friction-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: theme('colors.brand.text');
+            cursor: grab;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5), inset 0 -2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 20;
+            /* Center thumb vertically in the 60px track */
+            margin-top: 0px; 
+            border: 2px solid #cbd5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #friction-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        /* Specific thumb styling for Firefox */
+        #friction-slider::-moz-range-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: theme('colors.brand.text');
+            cursor: grab;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border: 2px solid #cbd5e1;
+        }
+        
+        .slider-text-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            pointer-events: none;
+            z-index: 5;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: theme('colors.brand.dark'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.brand.border'); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.brand.muted'); }
+    </style>
+</head>
+
+<body class="min-h-screen flex justify-center items-center p-4 sm:p-6 selection:bg-brand-accent selection:text-white">
+
+    <main class="w-full max-w-md bg-brand-card/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] border border-brand-border overflow-hidden relative">
+        
+        <!-- Top Accent Bar -->
+        <div class="h-1.5 w-full bg-gradient-to-r from-brand-danger via-brand-accent to-brand-success"></div>
+
+        <div class="p-8 sm:p-10">
+            
+            <header class="text-center mb-8">
+                <h1 class="text-2xl font-bold tracking-tight text-white mb-2">El Interruptor<br>Neurobiológico</h1>
+                <div class="inline-block px-3 py-1 bg-brand-dark rounded-full border border-brand-border">
+                    <p class="text-xs text-brand-muted uppercase tracking-wider font-semibold">Filtro de Fricción | Dinero Mental</p>
+                </div>
+            </header>
+
+            <!-- ================= VIEW 0: INTRO ================= -->
+            <div id="view-0" class="view-step active">
+                <div class="bg-brand-dark/50 rounded-2xl p-6 border border-brand-border/50 mb-8 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-16 h-16 bg-brand-danger/10 rounded-full blur-xl group-hover:bg-brand-danger/20 transition-colors duration-500"></div>
+                    <p class="text-center text-slate-300 leading-relaxed text-[15px]">
+                        Tu cerebro está en <strong class="text-brand-danger">modo crisis dopaminérgica</strong>. 
+                        <br><br>
+                        Para apagar la alarma de compra impulsiva y reconstruir el puente hacia tu lógica frontal, debes pasar por estos tres filtros biológicos.
+                    </p>
+                </div>
+                
+                <button onclick="startProtocol()" class="w-full group relative py-4 rounded-2xl bg-brand-accent text-brand-dark font-bold text-lg overflow-hidden transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-brand-accent/40 active:scale-95 shadow-[0_0_20px_rgba(245,166,35,0.3)] hover:shadow-[0_0_30px_rgba(245,166,35,0.5)]">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        Iniciar Descompresión
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </span>
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                </button>
+            </div>
+
+            <!-- ================= VIEW 1: VAGUS NERVE ================= -->
+            <div id="view-1" class="view-step">
+                <div class="text-center mb-8">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-accent/20 text-brand-accent font-bold text-sm mb-3">1</span>
+                    <h3 class="text-xl font-semibold text-white mb-2">Estimulación Vagal</h3>
+                    <p class="text-sm text-brand-muted">Sigue las instrucciones del círculo. Tienes 16 segundos para apagar el fuego en tu amígdala.</p>
+                </div>
+                
+                <!-- Breathing Visualizer -->
+                <div class="h-48 flex items-center justify-center mb-10">
+                    <div id="breath-shape" class="w-28 h-28 border-[3px] border-brand-border text-brand-muted rounded-full flex justify-center items-center text-center font-bold text-lg md:text-xl transition-all duration-300">
+                        <span id="breath-text" class="px-2">Preparando...</span>
+                    </div>
+                </div>
+
+                <!-- Biofeedback Bars -->
+                <div class="space-y-6">
+                    <!-- Amygdala Bar (Fear/Stress) -->
+                    <div>
+                        <div class="flex justify-between text-[11px] font-bold mb-2 text-slate-400 uppercase tracking-widest">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-brand-danger animate-pulse"></span> Alerta Amígdala</span> 
+                            <span id="amigdala-val" class="text-brand-danger font-mono text-sm">100%</span>
+                        </div>
+                        <div class="w-full h-4 bg-brand-dark rounded-full overflow-hidden border border-brand-border p-0.5">
+                            <div id="amigdala-bar" class="h-full w-full bg-brand-danger progress-fill rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cortisol Bar (Stress Hormone) -->
+                    <div>
+                        <div class="flex justify-between text-[11px] font-bold mb-2 text-slate-400 uppercase tracking-widest">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Cortisol</span> 
+                            <span id="cortisol-val" class="text-orange-500 font-mono text-sm">100%</span>
+                        </div>
+                        <div class="w-full h-4 bg-brand-dark rounded-full overflow-hidden border border-brand-border p-0.5">
+                            <div id="cortisol-bar" class="h-full w-full bg-orange-500 progress-fill rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hidden button that appears after breathing -->
+                <button id="btn-continue-v2" onclick="goToStep(2)" class="w-full mt-8 py-3 rounded-xl bg-brand-border text-white font-semibold opacity-0 pointer-events-none transition-all duration-500 hover:bg-slate-700">
+                    Continuar al Paso 2
+                </button>
+            </div>
+
+            <!-- ================= VIEW 2: AFFECTIVE LABELING ================= -->
+            <div id="view-2" class="view-step">
+                <div class="text-center mb-6">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-accent/20 text-brand-accent font-bold text-sm mb-3">2</span>
+                    <h3 class="text-xl font-semibold text-white mb-2">Etiquetado Afectivo</h3>
+                    <p class="text-sm text-brand-muted">Prohibido hablar de lo que quieres comprar.<br>Escribe qué te <strong class="text-white">frustra, agota o duele</strong> hoy.</p>
+                </div>
+                
+                <div class="relative mb-6 group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-accent/0 via-brand-accent/5 to-brand-accent/0 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none"></div>
+                    
+                    <textarea 
+                        id="affective-text" 
+                        rows="5" 
+                        class="w-full p-5 bg-brand-dark border-2 border-brand-border text-white rounded-2xl resize-none focus:outline-none focus:border-brand-accent/50 transition-all placeholder-slate-600 text-[15px] leading-relaxed relative z-10 shadow-inner" 
+                        placeholder="Hoy me siento exhausto/a porque..." 
+                        oninput="handleTextareaInput()"
+                    ></textarea>
+                    
+                    <!-- Character Progress Ring -->
+                    <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-brand-dark/90 px-3 py-1.5 rounded-lg border border-brand-border">
+                        <svg class="w-5 h-5 -rotate-90" viewBox="0 0 36 36">
+                            <path class="text-brand-border" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                            <path id="char-ring" class="text-brand-accent transition-all duration-300" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        </svg>
+                        <span id="char-count" class="text-xs font-mono font-bold text-slate-500">0/30</span>
+                    </div>
+                </div>
+                
+                <button id="btn-step-2" disabled onclick="goToStep(3)" class="w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-brand-dark disabled:text-slate-500 disabled:border disabled:border-brand-border
+                    bg-brand-accent text-brand-dark hover:bg-yellow-400 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-brand-accent/30 shadow-lg">
+                    Reconectar Lóbulo Frontal
+                </button>
+            </div>
+
+            <!-- ================= VIEW 3: MOTOR FRICTION ================= -->
+            <div id="view-3" class="view-step">
+                <div class="text-center mb-10">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-success/20 text-brand-success font-bold text-sm mb-3">3</span>
+                    <h3 class="text-xl font-semibold text-white mb-2">Fricción Motora</h3>
+                    <p class="text-sm text-brand-muted">Tu cuerpo está en piloto automático hacia la compra.<br>Desliza el interruptor pesadamente para <strong>abortar</strong>.</p>
+                </div>
+                
+                <div class="py-8">
+                    <div class="friction-slider-wrapper">
+                        <!-- Custom dynamic background fill -->
+                        <div id="slider-fill" class="slider-progress"></div>
+                        
+                        <!-- Background Text -->
+                        <div class="slider-text-overlay">
+                            <span class="text-slate-500">Impulso</span>
+                            <span id="slider-target-text" class="text-brand-success opacity-50 flex items-center gap-1 transition-opacity">
+                                Lógica <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </span>
+                        </div>
+                        
+                        <!-- Actual Input -->
+                        <input type="range" id="friction-slider" min="0" max="100" value="0" oninput="handleSliderInput()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW 4: SUCCESS ================= -->
+            <div id="view-4" class="view-step">
+                <div class="text-center p-8 bg-brand-success/10 border border-brand-success/30 rounded-3xl relative overflow-hidden group">
+                    <!-- Decorative background glows -->
+                    <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-success/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                    <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-brand-accent/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                    
+                    <div class="text-6xl mb-6 relative z-10 animate-float drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">🧠</div>
+                    
+                    <h2 class="text-3xl font-bold text-white mb-2 relative z-10 tracking-tight">Hechizo Roto</h2>
+                    <p class="text-brand-success font-medium text-sm uppercase tracking-widest mb-6 relative z-10">Puente Lógico Restaurado</p>
+                    
+                    <p class="text-slate-300 text-[15px] leading-relaxed mb-8 relative z-10">
+                        Acabas de apagar el secuestro de tu amígdala usando tu propia biología, <strong class="text-white">no tu cuenta corriente</strong>.
+                    </p>
+                    
+                    <div class="inline-flex items-center gap-2 px-5 py-3 bg-brand-dark/80 rounded-xl border border-brand-success/30 text-white font-medium text-sm relative z-10 shadow-lg backdrop-blur-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-brand-success" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                        Billetera Protegida. Descansa.
+                    </div>
+                </div>
+                
+                <button onclick="location.reload()" class="w-full mt-6 py-4 rounded-xl bg-transparent border border-brand-border text-brand-muted font-medium text-sm transition-all hover:bg-brand-border hover:text-white focus:outline-none">
+                    Reiniciar Protocolo (Testing)
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // System State
+        let currentStep = 0;
+        const totalSteps = 4;
+        
+        // DOM Elements - View 1
+        const shape = document.getElementById('breath-shape');
+        const breathText = document.getElementById('breath-text');
+        const amigdalaBar = document.getElementById('amigdala-bar');
+        const cortisolBar = document.getElementById('cortisol-bar');
+        const amigdalaVal = document.getElementById('amigdala-val');
+        const cortisolVal = document.getElementById('cortisol-val');
+        const btnContinueV1 = document.getElementById('btn-continue-v2');
+
+        // DOM Elements - View 2
+        const textArea = document.getElementById('affective-text');
+        const btnStep2 = document.getElementById('btn-step-2');
+        const charCount = document.getElementById('char-count');
+        const charRing = document.getElementById('char-ring');
+        const MIN_CHARS = 30;
+
+        // DOM Elements - View 3
+        const slider = document.getElementById('friction-slider');
+        const sliderFill = document.getElementById('slider-fill');
+        const sliderTargetText = document.getElementById('slider-target-text');
+
+        // --- Core Navigation ---
+        function goToStep(stepIndex) {
+            // Hide current
+            document.getElementById(`view-${currentStep}`).classList.remove('active');
+            
+            // Show new
+            currentStep = stepIndex;
+            const newView = document.getElementById(`view-${currentStep}`);
+            
+            // Small delay for smoother feel between display:none switches
+            setTimeout(() => {
+                newView.classList.add('active');
+                
+                // Specific View Initializations
+                if (currentStep === 2) {
+                    setTimeout(() => textArea.focus(), 500);
+                } else if (currentStep === 3) {
+                    slider.value = 0;
+                    updateSliderVisuals();
+                }
+            }, 50);
+        }
+
+        // --- View 1 Logic: Protocol Start & Breathing ---
+        function startProtocol() {
+            goToStep(1);
+            runBreathingSequence();
+        }
+
+        function runBreathingSequence() {
+            // Setup initial values
+            let aVal = 100;
+            let cVal = 100;
+            const totalDuration = 16000; // 16 seconds
+            const intervalTime = 100; // Update 10 times a second
+            const steps = totalDuration / intervalTime;
+            
+            // Decrease amounts per step to reach ~15% by end
+            const aDec = (100 - 12) / steps; 
+            const cDec = (100 - 20) / steps;
+
+            // Start CSS animation class
+            setTimeout(() => {
+                shape.classList.add('breath-animating');
+            }, 100);
+
+            // Text sequence timeline
+            setTimeout(() => { breathText.innerText = "Inhala (4s)"; }, 100);       // 0s
+            setTimeout(() => { breathText.innerText = "Sostén (4s)"; }, 4000);      // 4s
+            setTimeout(() => { breathText.innerText = "Exhala (4s)"; }, 8000);      // 8s
+            setTimeout(() => { breathText.innerText = "Sostén (4s)"; }, 12000);     // 12s
+            setTimeout(() => { 
+                breathText.innerText = "Fuego Apagado"; 
+                breathText.classList.add('text-brand-success');
+                // Show continue button
+                btnContinueV1.classList.remove('opacity-0', 'pointer-events-none');
+                btnContinueV1.classList.add('opacity-100');
+            }, 16000);    // 16s
+
+            // Biofeedback logic interval
+            const bioInterval = setInterval(() => {
+                if (aVal > 12) aVal -= aDec;
+                if (cVal > 20) cVal -= cDec;
+
+                // Update text numbers
+                amigdalaVal.innerText = Math.round(aVal) + '%';
+                cortisolVal.innerText = Math.round(cVal) + '%';
+
+                // Update Bar widths
+                amigdalaBar.style.width = `${aVal}%`;
+                cortisolBar.style.width = `${cVal}%`;
+
+                // Color shifts logic
+                if (aVal < 60 && aVal >= 30) {
+                    amigdalaBar.style.backgroundColor = '#F5A623'; // amber
+                    amigdalaVal.style.color = '#F5A623';
+                } else if (aVal < 30) {
+                    amigdalaBar.style.backgroundColor = '#10B981'; // green
+                    amigdalaVal.style.color = '#10B981';
+                }
+
+                if (cVal < 50) {
+                    cortisolBar.style.backgroundColor = '#F5A623';
+                    cortisolVal.style.color = '#F5A623';
+                }
+
+                if (aVal <= 13) {
+                    clearInterval(bioInterval);
+                }
+            }, intervalTime);
+        }
+
+        // --- View 2 Logic: Textarea ---
+        function handleTextareaInput() {
+            const length = textArea.value.trim().length;
+            
+            // Update text count
+            charCount.innerText = `${length}/${MIN_CHARS}`;
+            
+            // Calculate circle fill (max 100)
+            const percentage = Math.min((length / MIN_CHARS) * 100, 100);
+            charRing.setAttribute('stroke-dasharray', `${percentage}, 100`);
+
+            // State changes based on requirement met
+            if (length >= MIN_CHARS) {
+                btnStep2.disabled = false;
+                charCount.classList.remove('text-slate-500');
+                charCount.classList.add('text-brand-success');
+                charRing.classList.remove('text-brand-accent');
+                charRing.classList.add('text-brand-success');
+            } else {
+                btnStep2.disabled = true;
+                charCount.classList.add('text-slate-500');
+                charCount.classList.remove('text-brand-success');
+                charRing.classList.add('text-brand-accent');
+                charRing.classList.remove('text-brand-success');
+            }
+        }
+
+        // --- View 3 Logic: Friction Slider ---
+        function updateSliderVisuals() {
+            const val = slider.value;
+            // Update custom background fill
+            sliderFill.style.width = `${val}%`;
+            
+            // Make target text glow as you get closer
+            if(val > 50) {
+                sliderTargetText.style.opacity = (val / 100);
+                sliderTargetText.style.textShadow = `0 0 ${val/5}px rgba(16,185,129,0.5)`;
+            } else {
+                sliderTargetText.style.opacity = '0.5';
+                sliderTargetText.style.textShadow = 'none';
+            }
+        }
+
+        function handleSliderInput() {
+            updateSliderVisuals();
+            
+            // Snap logic - require full pull
+            if (slider.value > 98) {
+                slider.value = 100;
+                slider.disabled = true;
+                updateSliderVisuals();
+                
+                // Trigger success with slight delay
+                setTimeout(() => {
+                    goToStep(4);
+                }, 400);
+            }
+        }
+
+        // For touch devices, ensure slider snaps back if not completed (Friction mechanic)
+        slider.addEventListener('change', () => {
+             if (slider.value < 100 && !slider.disabled) {
+                 // Animate snap back
+                 let current = slider.value;
+                 const snapBack = setInterval(() => {
+                     current -= 5;
+                     if(current <= 0) {
+                         current = 0;
+                         clearInterval(snapBack);
+                     }
+                     slider.value = current;
+                     updateSliderVisuals();
+                 }, 16);
+             }
+        });
+        
+    </script>
+</body>
+</html>
